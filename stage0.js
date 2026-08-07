@@ -11,7 +11,6 @@ function tokenize(str) {
         .filter(w => w.length > 0)
 }
 
-
 for (let i = 0; i < docs.length; i++) {
     let words = tokenize(docs[i]);
     for (const word of words) {
@@ -81,7 +80,6 @@ function searchAnyWord(str){
         if (arr.length === 0)
             return [];
     }
-    
     return arr;
 }
 
