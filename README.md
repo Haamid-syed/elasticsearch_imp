@@ -1,4 +1,3 @@
-# elasticsearch_imp
 Tiny Search Engine in JavaScript
 
 This repository documents my journey of building a simple search engine from scratch in JavaScript, starting with zero knowledge of search indexing.
