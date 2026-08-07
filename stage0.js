@@ -12,12 +12,6 @@ for (let i = 0; i < arr.length; i++) {
     }
 }
 
-// Convert Sets to arrays
-
-// for (let key in idx) {
-//     idx[key] = [...idx[key]];
-// }
-
 function searchWord(word) {
     return idx[word] || new Set();;
 }
