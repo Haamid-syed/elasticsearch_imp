@@ -3,6 +3,15 @@ let docs = ["hello hello hello how are you", "hello im doing fine how about you"
 
 // 2 ptr approach =>
 
+function tokenize(str) {
+    return str
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .split(/\s+/)
+        .filter(w => w.length > 0)
+}
+
+
 for (let i = 0; i < docs.length; i++) {
     let words = tokenize(docs[i]);
     for (const word of words) {
@@ -15,14 +24,14 @@ for (let i = 0; i < docs.length; i++) {
     }
 }
 
-function searchWords(str){
+function searchAllWords(str){
     let words = tokenize(str);
     if(words.length === 0) return [];
     for (let word of words) {
         if (!idx[word]) return [];
     }
     words.sort((a, b) => idx[a].length - idx[b].length);
-    let arr = idx[words[0]];
+    let arr = [...idx[words[0]]]; // direct assignment points to object array reference
 
     for(let k = 1; k < words.length; k++){
         let i = 0, j = 0;
@@ -45,16 +54,38 @@ function searchWords(str){
     return arr;
 }
 // console.log(idx)
-console.log(searchWords("im fine"));
+// console.log(searchAllWords(".  im   fine.  /)&   "));
 
-function tokenize(str) {
-    return str
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, "")
-        .split(/\s+/)
-        .filter(w => w.length > 0);
+function searchAnyWord(str){
+    let words = tokenize(str);
+    if(words.length === 0) return [];
+    let arr = idx[words[0]];
+    let i = 0, j = 0;
+    for(let k = 1; k < words.length; k++){
+        i = 0, j = 0;
+        const curr = idx[words[k]];
+        let temp = [];
+        while(i < arr.length && j < curr.length){
+            if(arr[i] < curr[j]){
+                temp.push(arr[i++]);
+            } else if(arr[i] > curr[j]){
+                temp.push(curr[j++]);
+            } else {
+                temp.push(arr[i++]);
+                j++;
+            }
+        }
+        while(i < arr.length) temp.push(arr[i++]);
+        while(j < curr.length) temp.push(curr[j++]);
+        arr = temp;
+        if (arr.length === 0)
+            return [];
+    }
+    
+    return arr;
 }
 
+console.log(searchAnyWord(""));
 
 // Set approach =>
 // for (let i = 0; i < arr.length; i++) {
