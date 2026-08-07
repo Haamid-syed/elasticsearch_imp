@@ -1,3 +1,4 @@
+// And, OR search, tokenisation
 let idx = {};
 let docs = ["hello hello hello how are you", "hello im doing fine how about you", "yea im doing fine too bro"];
 
@@ -86,6 +87,7 @@ function searchAnyWord(str){
 console.log(searchAnyWord(""));
 
 // Set approach =>
+
 // for (let i = 0; i < arr.length; i++) {
 //     let words = arr[i].split(" ");
 

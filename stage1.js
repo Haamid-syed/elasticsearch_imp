@@ -1,3 +1,4 @@
+// phrase search
 let idx = {};
 let docs = ["hello hello hello how are you", "hello how im doing fine how about you fine are doing", "yea im doing fine too bro doing"];
 
@@ -28,7 +29,7 @@ function searchPhrase(str){
     if(words.length === 1) return docIds;
     let results = []
     for(const id of docIds){
-        // for each starting position of words[0] in doc `id`
+        // for each starting position of words[0] in doc id
         for (let startPos of idx[words[0]].get(id)) {
             let valid = true;
             for (let i = 1; i < words.length; i++) {
