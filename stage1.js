@@ -1,6 +1,9 @@
 // phrase search
+const natural = require('natural');
+const stemmer = natural.PorterStemmer;
+
 let idx = {};
-let docs = ["hello hello hello how are you", "hello how im doing fine how about you fine are doing", "yea im doing fine too bro doing"];
+let docs = ["hello hello hello how are you sleeping", "hello how im doing fine how about you fine are doing", "yea im doing fine too bro doing"];
 
 function tokenize(str) {
     return str
@@ -8,6 +11,7 @@ function tokenize(str) {
         .replace(/[^a-z0-9\s]/g, "")
         .split(/\s+/)
         .filter(w => w.length > 0)
+        .map(w => stemmer.stem(w));
 }
 
 for (let i = 0; i < docs.length; i++) {
@@ -20,7 +24,6 @@ for (let i = 0; i < docs.length; i++) {
         idx[words[j]].get(i).push(j)
     }
 }
-console.log(idx)
 
 function searchPhrase(str){
     let docIds = searchAllWords(str)
@@ -73,4 +76,5 @@ function searchAllWords(str){
     }
     return arr;
 }
-console.log(searchPhrase("how abou t"))
+console.log(idx)
+console.log(searchPhrase("sleeping"))
