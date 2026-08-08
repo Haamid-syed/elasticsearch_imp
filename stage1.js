@@ -25,6 +25,27 @@ for (let i = 0; i < docs.length; i++) {
     }
 }
 
+function binarySearch(arr, target) {
+    let left = 0;
+    let right = arr.length - 1;
+
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+
+        if (arr[mid] === target) {
+            return true;
+        }
+
+        if (arr[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return false;
+}
+
 function searchPhrase(str){
     let docIds = searchAllWords(str)
     if(docIds.length === 0) return [];
@@ -32,12 +53,15 @@ function searchPhrase(str){
     if(words.length === 1) return docIds;
     let results = []
     for(const id of docIds){
-        // for each starting position of words[0] in doc id
+        // O(logP)
         for (let startPos of idx[words[0]].get(id)) {
             let valid = true;
             for (let i = 1; i < words.length; i++) {
-                const posSet = new Set(idx[words[i]].get(id));
-                if (!posSet.has(startPos + i)) { valid = false; break; }
+                const positions = idx[words[i]].get(id);
+                if (!binarySearch(positions, startPos + i)) {
+                    valid = false;
+                    break;
+                }
             }
             if (valid) {
                 results.push(id);
@@ -77,4 +101,25 @@ function searchAllWords(str){
     return arr;
 }
 console.log(idx)
-console.log(searchPhrase("sleeping"))
+console.log(searchPhrase("hello how im"))
+
+/*
+  O(P) approach
+    for(const id of docIds){
+        // for each starting position of words[0] in doc id
+        for (let startPos of idx[words[0]].get(id)) {
+            let valid = true;
+            for (let i = 1; i < words.length; i++) {
+                const positions = idx[words[i]].get(id);
+                if (!positions.includes(startPos + i)) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (valid) {
+                results.push(id);
+                break; 
+            }
+        }
+    }
+*/
