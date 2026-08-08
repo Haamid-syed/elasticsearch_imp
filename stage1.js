@@ -1,5 +1,4 @@
 // phrase search
-// const natural = require('natural');
 import natural from 'natural'
 const stemmer = natural.PorterStemmer;
 
@@ -54,7 +53,7 @@ function searchPhrase(str){
     if(words.length === 1) return docIds;
     let results = []
     for(const id of docIds){
-        // O(logP)
+        // O(logP) => B.S
         for (let startPos of idx[words[0]].get(id)) {
             let valid = true;
             for (let i = 1; i < words.length; i++) {
@@ -101,6 +100,7 @@ function searchAllWords(str){
     }
     return arr;
 }
+
 console.log(idx)
 console.log(searchPhrase("hello how im"))
 
