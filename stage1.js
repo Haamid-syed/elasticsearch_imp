@@ -1,5 +1,6 @@
 // phrase search
-const natural = require('natural');
+// const natural = require('natural');
+import natural from 'natural'
 const stemmer = natural.PorterStemmer;
 
 let idx = {};
