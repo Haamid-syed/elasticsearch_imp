@@ -1,7 +1,8 @@
 // TF / IDF
 
 let idx = {};
-let docs = ["hello at how are you", "hello im doing fine hello how about you", "yea im doing fine too bro"];
+// let docs = ["hello at how are you", "hello im doing fine hello how about you", "yea im doing fine too bro"];
+let docs = ["the cat sat on the mat", "the dog barked at the the man", "cat chased cat the the dog"]
 let prepWords = new Set(['to', 'the', 'on', 'of', 'at', 'in', 'through', 'under', 'over', 'by', 'from', 'about', 'too']);
 let docLengths = [];
 
@@ -25,8 +26,12 @@ for (let i = 0; i < docs.length; i++) {
     }
 }
 
+let idf = {};
+for(let word in idx){
+    idf[word] = Math.log(docs.length / idx[word].size);
+}
+
 function searchAllWords(words){
-    if(words.length === 0) return [];
     if(words.length === 0) return [];
     for (let word of words) {
         if (!idx[word]) return [];
@@ -62,7 +67,7 @@ function rank(arr, words){
     for(let docId of arr){
         let sum = 0;
         for(let word of words){
-            sum += (idx[word].get(docId).length) / docLengths[docId]
+            sum += (idx[word].get(docId).length / docLengths[docId]) * idf[word];
         }
         rankings.push({sum, docId})
     }
@@ -78,4 +83,4 @@ function searchRanked(str) {
     return rankedDocs.map((elem) => elem.docId);
 }
 
-console.log(searchRanked("hello"))
+console.log(searchRanked("the cat"))
