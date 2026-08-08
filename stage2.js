@@ -10,7 +10,7 @@ function tokenize(str) {
         .toLowerCase()
         .replace(/[^a-z0-9\s]/g, "")
         .split(/\s+/)
-        .filter(w => w.length > 0)
+        .filter(w => w.length > 0 && !prepWords.has(w))
 }
 
 for (let i = 0; i < docs.length; i++) {
@@ -25,8 +25,8 @@ for (let i = 0; i < docs.length; i++) {
     }
 }
 
-function searchAllWords(str){
-    let words = tokenize(str);
+function searchAllWords(words){
+    if(words.length === 0) return [];
     if(words.length === 0) return [];
     for (let word of words) {
         if (!idx[word]) return [];
@@ -73,10 +73,9 @@ function rank(arr, words){
 
 function searchRanked(str) {
     let words = tokenize(str);
-    let candidates = searchAllWords(str);
+    let candidates = searchAllWords(words); // pass words array in
     let rankedDocs = rank(candidates, words);
-    let result = rankedDocs.map((elem) => elem.docId)
-    return result;
+    return rankedDocs.map((elem) => elem.docId);
 }
 
 console.log(searchRanked("hello"))
