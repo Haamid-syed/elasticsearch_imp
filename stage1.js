@@ -73,4 +73,4 @@ function searchAllWords(str){
     }
     return arr;
 }
-console.log(searchPhrase("hello how are"))
+console.log(searchPhrase("how abou t"))

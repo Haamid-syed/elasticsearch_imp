@@ -1,6 +1,7 @@
 // And, OR search, tokenisation
 let idx = {};
-let docs = ["hello hello hello how are you", "hello im doing fine how about you", "yea im doing fine too bro"];
+let docs = ["hello hello hello at how are you", "hello im doing fine how about you", "yea im doing fine too bro"];
+let prepWords = new Set(['to', 'the', 'on', 'of', 'at', 'in', 'through', 'under', 'over', 'by', 'from', 'about', 'too']);
 
 // 2 ptr approach =>
 
@@ -15,17 +16,18 @@ function tokenize(str) {
 for (let i = 0; i < docs.length; i++) {
     let words = tokenize(docs[i]);
     for (const word of words) {
+        if(prepWords.has(word)) continue;
         if (!idx[word]) {
             idx[word] = [];
         }
-        if(idx[word].length === 0 || idx[word][idx[word].length - 1] != i){
+        if(( idx[word].length === 0 || idx[word][idx[word].length - 1] != i)){
             idx[word].push(i)
         }
     }
 }
 
 function searchAllWords(str){
-    let words = tokenize(str);
+    let words = tokenize(str).filter(w => !prepWords.has(w));
     if(words.length === 0) return [];
     for (let word of words) {
         if (!idx[word]) return [];
@@ -53,11 +55,11 @@ function searchAllWords(str){
     }
     return arr;
 }
-// console.log(idx)
+console.log(idx)
 // console.log(searchAllWords(".  im   fine.  /)&   "));
 
 function searchAnyWord(str){
-    let words = tokenize(str);
+    let words = tokenize(str).filter(w => !prepWords.has(w));
     if(words.length === 0) return [];
     let arr = idx[words[0]];
     let i = 0, j = 0;
@@ -84,7 +86,7 @@ function searchAnyWord(str){
     return arr;
 }
 
-console.log(searchAnyWord(""));
+console.log(searchAnyWord("at"));
 
 // Set approach =>
 
