@@ -103,15 +103,86 @@ function findSimilarTerms(word, maxDistance = 2) {
             });
         }
     }
+    console.log(matches)
     return matches;
 }
+
+function searchFuzzyWords(str) {
+
+    let candidateDocs = [];
+    let words = tokenize(str).filter(w => !prepWords.has(w));
+    for (let word of words) {
+
+        let similarTerms = findSimilarTerms(word);
+
+        let docsForWord = new Set();
+
+        // OR between fuzzy matches of ONE query word
+        for (let obj of similarTerms) {
+
+            for (let docId of idx[obj.term]) {
+                docsForWord.add(docId);
+            }
+        }
+        if (docsForWord.size === 0) {
+            return [];
+        }
+        candidateDocs.push([...docsForWord].sort((a, b) => a - b));
+    }
+    if (candidateDocs.length === 0) {
+        return [];
+    }
+
+    // AND between different query words
+    candidateDocs.sort((a, b) => a.length - b.length);
+
+    let arr = candidateDocs[0];
+
+    for (let k = 1; k < candidateDocs.length; k++) {
+
+        let curr = candidateDocs[k];
+
+        let i = 0;
+        let j = 0;
+        let temp = [];
+
+        while (i < arr.length && j < curr.length) {
+
+            if (arr[i] === curr[j]) {
+
+                temp.push(arr[i]);
+                i++;
+                j++;
+
+            } else if (arr[i] < curr[j]) {
+
+                i++;
+
+            } else {
+
+                j++;
+            }
+        }
+
+        arr = temp;
+
+        if (arr.length === 0) {
+            return [];
+        }
+    }
+
+    return arr;
+}
+
+console.log(searchFuzzyWords("caat hello"))
 
 // console.log(levenshtein("cat", "cat"));   // 0
 // console.log(levenshtein("cat", "cut"));   // 1
 
-console.log(findSimilarTerms("caat"));
+// console.log(findSimilarTerms("caat"));
+// console.log(findSimilarTerms("ciiit"));
+// console.log(findSimilarTerms("coot"));
+// console.log(findSimilarTerms("helo"));
+// console.log(findSimilarTerms("xyz"));
 
-console.log(findSimilarTerms("ciiit"));
-console.log(findSimilarTerms("coot"));
-console.log(findSimilarTerms("helo"));
-console.log(findSimilarTerms("xyz"));
+// console.log(idx)
