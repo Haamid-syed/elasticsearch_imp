@@ -1,4 +1,4 @@
-// Levenshtein Distance
+// Levenshtein Distance based retrieval and bm25 ranking
 let idx = {};
 let docs = ["hello hello hello at how cut are you", "hello im doing fine coot how about you", "yea cat cut ciiit im doing fine too bro"];
 let prepWords = new Set(['to', 'the', 'on', 'of', 'at', 'in', 'through', 'under', 'over', 'by', 'from', 'about', 'too']);
@@ -16,7 +16,6 @@ function tokenize(str) {
 for (let i = 0; i < docs.length; i++) {
 
     let words = tokenize(docs[i]);
-
     for (const word of words) {
 
         if (prepWords.has(word)) continue;
@@ -28,7 +27,6 @@ for (let i = 0; i < docs.length; i++) {
         if (!idx[word].has(i)) {
             idx[word].set(i, 0);
         }
-
         idx[word].set(
             i,
             idx[word].get(i) + 1
@@ -49,26 +47,18 @@ function searchAllWords(str){
 
         let i = 0;
         let j = 0;
-
         const curr = [...idx[words[k]].keys()];
-
         let temp = [];
 
         while (i < arr.length && j < curr.length) {
 
             if (arr[i] === curr[j]) {
-
                 temp.push(arr[i]);
-
                 i++;
                 j++;
-
             } else if (arr[i] < curr[j]) {
-
                 i++;
-
             } else {
-
                 j++;
             }
         }
