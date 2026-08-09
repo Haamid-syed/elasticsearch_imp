@@ -1,4 +1,4 @@
-// And, OR search, tokenisation
+// Levenshtein Distance
 let idx = {};
 let docs = ["hello hello hello at how cut are you", "hello im doing fine coot how about you", "yea cat cut ciiit im doing fine too bro"];
 let prepWords = new Set(['to', 'the', 'on', 'of', 'at', 'in', 'through', 'under', 'over', 'by', 'from', 'about', 'too']);
@@ -14,15 +14,25 @@ function tokenize(str) {
 }
 
 for (let i = 0; i < docs.length; i++) {
+
     let words = tokenize(docs[i]);
+
     for (const word of words) {
-        if(prepWords.has(word)) continue;
+
+        if (prepWords.has(word)) continue;
+
         if (!idx[word]) {
-            idx[word] = [];
+            idx[word] = new Map();
         }
-        if(( idx[word].length === 0 || idx[word][idx[word].length - 1] != i)){
-            idx[word].push(i)
+
+        if (!idx[word].has(i)) {
+            idx[word].set(i, 0);
         }
+
+        idx[word].set(
+            i,
+            idx[word].get(i) + 1
+        );
     }
 }
 
@@ -32,20 +42,33 @@ function searchAllWords(str){
     for (let word of words) {
         if (!idx[word]) return [];
     }
-    words.sort((a, b) => idx[a].length - idx[b].length);
-    let arr = [...idx[words[0]]]; // direct assignment points to object array reference
+    words.sort((a, b) => idx[a].size - idx[b].size);
+    let arr = [...idx[words[0]].keys()];
 
-    for(let k = 1; k < words.length; k++){
-        let i = 0, j = 0;
-        const curr = idx[words[k]];
+    for (let k = 1; k < words.length; k++) {
+
+        let i = 0;
+        let j = 0;
+
+        const curr = [...idx[words[k]].keys()];
+
         let temp = [];
-        while(i < arr.length && j < curr.length){
-            if(arr[i] === curr[j]){
+
+        while (i < arr.length && j < curr.length) {
+
+            if (arr[i] === curr[j]) {
+
                 temp.push(arr[i]);
-                i++, j++;
-            }else if(arr[i] < curr[j]){
+
                 i++;
-            }else{
+                j++;
+
+            } else if (arr[i] < curr[j]) {
+
+                i++;
+
+            } else {
+
                 j++;
             }
         }
@@ -107,72 +130,83 @@ function findSimilarTerms(word, maxDistance = 2) {
     return matches;
 }
 
-function searchFuzzyWords(str) {
 
+function searchFuzzyWords(str) {
+    let words = tokenize(str)
+        .filter(w => !prepWords.has(w));
+
+    if (words.length === 0) {
+        return new Map();
+    }
     let candidateDocs = [];
-    let words = tokenize(str).filter(w => !prepWords.has(w));
     for (let word of words) {
 
-        let similarTerms = findSimilarTerms(word);
+        let similarTerms =
+            findSimilarTerms(word);
+        let docsForWord = new Map();
 
-        let docsForWord = new Set();
-
-        // OR between fuzzy matches of ONE query word
         for (let obj of similarTerms) {
+            let term = obj.term;
+            let distance = obj.distance;
 
-            for (let docId of idx[obj.term]) {
-                docsForWord.add(docId);
+            for (let docId of idx[term].keys()) {
+                if (!docsForWord.has(docId)) {
+                    docsForWord.set(docId, []);
+                }
+                docsForWord
+                    .get(docId)
+                    .push({
+                        term,
+                        distance
+                    });
             }
         }
         if (docsForWord.size === 0) {
-            return [];
+            return new Map();
         }
-        candidateDocs.push([...docsForWord].sort((a, b) => a - b));
-    }
-    if (candidateDocs.length === 0) {
-        return [];
+        candidateDocs.push(docsForWord);
     }
 
-    // AND between different query words
-    candidateDocs.sort((a, b) => a.length - b.length);
+    candidateDocs.sort(
+        (a, b) => a.size - b.size
+    );
 
-    let arr = candidateDocs[0];
+    let result = candidateDocs[0];
 
     for (let k = 1; k < candidateDocs.length; k++) {
 
         let curr = candidateDocs[k];
-
-        let i = 0;
-        let j = 0;
-        let temp = [];
-
-        while (i < arr.length && j < curr.length) {
-
-            if (arr[i] === curr[j]) {
-
-                temp.push(arr[i]);
-                i++;
-                j++;
-
-            } else if (arr[i] < curr[j]) {
-
-                i++;
-
-            } else {
-
-                j++;
+        let temp = new Map();
+        for (let [docId, matches] of result) {
+            if (curr.has(docId)) {
+                temp.set(
+                    docId,
+                    [
+                        ...matches,
+                        ...curr.get(docId)
+                    ]
+                );
             }
         }
-
-        arr = temp;
-
-        if (arr.length === 0) {
-            return [];
+        result = temp;
+        if (result.size === 0) {
+            return new Map();
         }
     }
-
-    return arr;
+    return result;
 }
+
+console.log("INDEX:");
+console.log(idx);
+
+// console.log("\nEXACT SEARCH:");
+// console.log(searchAllWords("hello cut"));
+
+// console.log("\nFUZZY TERM:");
+// console.log(findSimilarTerms("caat"));
+
+console.log("\nFUZZY SEARCH:");
+console.log(searchFuzzyWords("caat hello"))
 
 console.log(searchFuzzyWords("caat hello"))
 
